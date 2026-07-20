@@ -89,6 +89,9 @@ navLinks.forEach(link => {
         
         document.getElementById(targetId).classList.add('active');
         link.classList.add('active');
+        
+        // Close mobile navigation after link click
+        closeMobileNav();
     });
 });
 
@@ -809,4 +812,25 @@ function downloadBlob(content, filename, contentType) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename; a.click();
-}
+}document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.querySelector('.hamburger-toggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  
+  if (toggleBtn && mobileMenu) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileMenu.classList.toggle('active');
+      
+      // Polish: Change burger icon to close 'X' smoothly
+      toggleBtn.innerHTML = mobileMenu.classList.contains('active') ? '✕' : '☰';
+    });
+    
+    // Smooth closing mechanics when clicking outside the menu drawer
+    document.addEventListener('click', (e) => {
+      if (!mobileMenu.contains(e.target) && mobileMenu.classList.contains('active')) {
+        mobileMenu.classList.remove('active');
+        toggleBtn.innerHTML = '☰';
+      }
+    });
+  }
+});
