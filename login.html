@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - StokSaaS Manajemen</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Desain Khusus Halaman Login Full Screen */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, var(--emerald-light), var(--bg-app));
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+        }
+        .alert-error {
+            background-color: #fee2e2;
+            color: #ef4444;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #fca5a5;
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="login-container">
+        <div id="login-alert" class="alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Username atau Password salah!</span>
+        </div>
+
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fa-solid fa-cubes-stacked login-logo"></i>
+                <h2>Stok<span class="text-emerald">SaaS</span></h2>
+                <p>Masuk ke panel manajemen stok</p>
+            </div>
+            
+            <form id="form-login-standalone" onsubmit="handleSecureLogin(event)">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="login-username" placeholder="Masukkan username" required class="form-control" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" placeholder="Masukkan password" required class="form-control">
+                </div>
+                <button type="submit" class="btn btn-emerald btn-block" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Cek jika admin sudah login sebelumnya, langsung lempar ke dashboard
+        if (localStorage.getItem('saas_is_logged_in') === 'true') {
+            window.location.href = 'index.html';
+        }
+
+        function handleSecureLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value;
+            const p = document.getElementById('login-password').value;
+            const alertBox = document.getElementById('login-alert');
+
+            // Kredensial Akses Admin
+            if (u === 'admin' && p === 'admin123') {
+                localStorage.setItem('saas_is_logged_in', 'true');
+                window.location.href = 'index.html'; // Pindah ke dashboard
+            } else {
+                // Tampilkan pesan error jika salah
+                alertBox.style.display = 'flex';
+                document.getElementById('login-password').value = ''; // Reset password field
+                
+                // Sembunyikan error otomatis setelah 4 detik
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 4000);
+            }
+        }
+    </script>
+</body>
+</html>

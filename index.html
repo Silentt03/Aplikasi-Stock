@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BP Stock - Manajemen Stok Barang</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon"></span>
+            <h2>BP Stock</h2>
+        </div>
+        <button id="theme-toggle" class="btn btn-outline" onclick="toggleDarkMode()"><i data-lucide="moon"></i> Gelap</button>
+        <ul>
+            <li><a href="#dashboard" class="nav-link active"><i data-lucide="layout-dashboard"></i> Ringkasan</a></li>
+            <li><a href="#master-barang" class="nav-link"><i data-lucide="package"></i> PRODUK</a></li>
+            <li><a href="#transaksi" class="nav-link"><i data-lucide="arrow-left-right"></i> Transaksi</a></li>
+            <li><a href="#riwayat" class="nav-link"><i data-lucide="history"></i> Riwayat</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        
+        <section id="dashboard" class="content-section active">
+            <h1>Dashboard</h1>
+            <div class="stats-grid">
+                <div class="card bg-blue">
+                    <div class="card-info">
+                        <h3>Total Jenis Barang</h3>
+                        <p id="stat-total-jenis">0</p>
+                    </div>
+                    <i data-lucide="box"></i>
+                </div>
+                <div class="card bg-green">
+                    <div class="card-info">
+                        <h3>Total Stok Saat Ini</h3>
+                        <p id="stat-total-stok">0</p>
+                    </div>
+                    <i data-lucide="layers"></i>
+                </div>
+            </div>
+            <div class="chart-overview">
+                <div class="section-header">
+                    <h2>Grafik Transaksi Bulanan</h2>
+                    <button class="btn btn-outline" onclick="exportMonthlySummaryCSV()"><i data-lucide="download"></i> Export Bulanan</button>
+                </div>
+                <div class="chart-card">
+                    <canvas id="chartMonthlyTransaksi" height="260"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-overview" style="margin-top: 2rem;">
+                <div class="section-header">
+                    <h2>Rekapan Transaksi Per Bulan</h2>
+                </div>
+                <div class="table-container">
+                    <table id="table-monthly-summary">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Kategori</th>
+                                <th class="text-right">Masuk</th>
+                                <th class="text-right">Keluar</th>
+                                <th class="text-right">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-monthly-summary">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="master-barang" class="content-section">
+            <div class="section-header">
+                <h1>PRODUK</h1>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button class="btn btn-outline" onclick="exportProdukToExcel()"><i data-lucide="download"></i> Export Excel</button>
+                    <button class="btn btn-primary" onclick="toggleModal('modal-barang')"><i data-lucide="plus"></i> Barang Baru</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-barang" placeholder="Cari nama barang..." oninput="renderApp()">
+            </div>
+
+            <div class="table-container">
+                <table id="table-barang">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Stok</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-barang">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="transaksi" class="content-section">
+            <h1>Transaksi Stok</h1>
+            <div class="form-container">
+                <form id="form-transaksi" onsubmit="simpanTransaksi(event)">
+                    <div class="form-group">
+                        <label for="tx-barang">Pilih Barang</label>
+                        <select id="tx-barang" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tx-jenis">Jenis Transaksi</label>
+                        <select id="tx-jenis" required>
+                            <option value="masuk">Barang Masuk (+)</option>
+                            <option value="keluar">Barang Keluar (-)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tx-jumlah">Jumlah</label>
+                        <input type="number" id="tx-jumlah" min="1" required placeholder="Contoh: 10">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i data-lucide="save"></i> Simpan Transaksi</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="riwayat" class="content-section">
+            <div class="section-header">
+                <h1>Riwayat Transaksi</h1>
+                <button class="btn btn-danger" onclick="hapusRiwayat()"><i data-lucide="trash"></i> Bersihkan Riwayat</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Nama Barang</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-riwayat">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal-barang" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Tambah Barang Baru</h3>
+                <span class="close-modal" onclick="toggleModal('modal-barang')">&times;</span>
+            </div>
+            <form id="form-barang" onsubmit="simpanBarangBaru(event)">
+                <input type="hidden" id="edit-index">
+                <div class="form-group">
+                    <label for="brg-nama">Nama Barang</label>
+                    <input type="text" id="brg-nama" required placeholder="Nama Produk">
+                </div>
+                <div class="form-group" id="stok-awal-container">
+                    <label for="brg-stok">Stok Awal</label>
+                    <input type="text" id="brg-stok" inputmode="numeric" pattern="[0-9.,]*" value="0" required>
+                    <small class="text-muted">Gunakan angka bulat tanpa huruf atau simbol lain.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="script.js"></script>
+</body>
+</html>
